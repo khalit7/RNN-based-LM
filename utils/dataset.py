@@ -28,6 +28,8 @@ def _build_vocab(data_itr,tokenizer):
     return v
 
 
+# TODO: 1.make the padding per batch rather than for the whole dataset, put sentances with simillar length in the same batch (will create some bias but will speed up the training significantly)
+# TODO: 2.Use masked loss, we don't want to penalize the model for not being able to predict <PAD>
 def _collate_fn(batch,vocab,tokenizer):
     '''
     takes a batch of paragraphs from the dataset, returns a batch of X,Y
@@ -53,8 +55,7 @@ def _collate_fn(batch,vocab,tokenizer):
             if len(chunk) <= CONSTANTS.max_seq_len:
                 num_of_pads = (CONSTANTS.max_seq_len-len(chunk))
                 chunk =  vocab(["<SOS>"]) + chunk + vocab(["<EOS>"]) + vocab(["<PAD>"])*num_of_pads
-
-                                            
+                  
             X.append(chunk[0:-1]) # all but the last
             Y.append(chunk[1:])   # all but the first
         
